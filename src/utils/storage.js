@@ -324,31 +324,6 @@ export const addCustomPlatform = async (platformName) => {
     }
 };
 
-// ===== INITIALIZATION =====
-
-export const initializeDatabase = async () => {
-    try {
-        // Check if admin user exists
-        const admin = await getUserByUsername('admin');
-
-        if (!admin) {
-            // Create default admin user
-            await saveUser({
-                username: 'admin',
-                password: 'admin123', // This should be hashed in production
-                fullName: 'Administrator',
-                role: 'admin',
-                currency: 'MXN$'
-            });
-            console.log('✅ Default admin user created');
-        }
-
-        return true;
-    } catch (error) {
-        console.error('Error initializing database:', error);
-        return false;
-    }
-};
 
 // Initialize on module load
 initializeDatabase();
