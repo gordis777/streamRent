@@ -23,7 +23,7 @@ const Login = () => {
         setError('');
         setLoading(true);
 
-        const result = login(username, password);
+        const result = await login(username, password);  // ✅ Added await
 
         if (result.success) {
             navigate('/');
