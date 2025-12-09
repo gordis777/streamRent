@@ -122,8 +122,8 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, error: 'Contraseña incorrecta' };
             }
 
-            // Check subscription status - ALL users must have active subscription
-            if (user.subscription_end_date) {
+            // Check subscription status - ONLY for regular users (not admins)
+            if (user.role !== 'admin' && user.subscription_end_date) {
                 const now = new Date();
                 const endDate = new Date(user.subscription_end_date);
 
