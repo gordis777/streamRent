@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Calendar } from 'lucide-react';
+import { calculateEndDate, formatSubscriptionDate, getSubscriptionDurationOptions } from '../utils/subscriptionHelpers';
 
 const UserForm = ({ user, onSave, onClose }) => {
     const [formData, setFormData] = useState({
@@ -7,10 +8,25 @@ const UserForm = ({ user, onSave, onClose }) => {
         fullName: user?.fullName || '',
         password: user ? '' : '', // Don't pre-fill password for edit
         role: user?.role || 'user',
-        currency: user?.currency || '$'
+        currency: user?.currency || '$',
+        subscriptionDurationMonths: user?.subscriptionDurationMonths || 1,
+        subscriptionStartDate: user?.subscriptionStartDate || new Date().toISOString().split('T')[0]
     });
 
+    const [calculatedEndDate, setCalculatedEndDate] = useState(null);
+
     const [errors, setErrors] = useState({});
+
+    // Auto-calculate end date when duration or start date changes
+    useEffect(() => {
+        if (formData.subscriptionStartDate && formData.subscriptionDurationMonths) {
+            const endDate = calculateEndDate(
+                formData.subscriptionStartDate,
+                formData.subscriptionDurationMonths
+            );
+            setCalculatedEndDate(endDate);
+        }
+    }, [formData.subscriptionStartDate, formData.subscriptionDurationMonths]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -60,7 +76,9 @@ const UserForm = ({ user, onSave, onClose }) => {
             username: formData.username,
             fullName: formData.fullName,
             role: formData.role,
-            currency: formData.currency
+            currency: formData.currency,
+            subscriptionDurationMonths: parseInt(formData.subscriptionDurationMonths),
+            subscriptionStartDate: formData.subscriptionStartDate
         };
 
         // Only include password if it's set (new user or password change)
@@ -159,6 +177,68 @@ const UserForm = ({ user, onSave, onClose }) => {
                             <option value="ARS$">AR$ - Peso Argentino</option>
                             <option value="COP$">CO$ - Peso Colombiano</option>
                         </select>
+                    </div>
+
+                    {/* Subscription Section */}
+                    <div style={{
+                        padding: 'var(--spacing-md)',
+                        background: 'rgba(168, 85, 247, 0.1)',
+                        border: '1px solid rgba(168, 85, 247, 0.3)',
+                        borderRadius: 'var(--radius-md)',
+                        marginBottom: 'var(--spacing-lg)'
+                    }}>
+                        <h3 style={{
+                            fontSize: '1rem',
+                            marginBottom: 'var(--spacing-md)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 'var(--spacing-sm)'
+                        }}>
+                            <Calendar size={18} />
+                            Suscripción
+                        </h3>
+
+                        <div className="form-group" style={{ marginBottom: 'var(--spacing-md)' }}>
+                            <label className="form-label">Duración *</label>
+                            <select
+                                name="subscriptionDurationMonths"
+                                value={formData.subscriptionDurationMonths}
+                                onChange={handleChange}
+                                className="form-select"
+                            >
+                                {getSubscriptionDurationOptions().map(option => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 'var(--spacing-md)' }}>
+                            <label className="form-label">Fecha de Inicio *</label>
+                            <input
+                                type="date"
+                                name="subscriptionStartDate"
+                                value={formData.subscriptionStartDate}
+                                onChange={handleChange}
+                                className="form-input"
+                            />
+                        </div>
+
+                        {calculatedEndDate && (
+                            <div style={{
+                                padding: 'var(--spacing-sm)',
+                                background: 'rgba(16, 185, 129, 0.1)',
+                                border: '1px solid rgba(16, 185, 129, 0.3)',
+                                borderRadius: 'var(--radius-sm)',
+                                fontSize: '0.875rem'
+                            }}>
+                                <strong>Fecha de Expiración:</strong>{' '}
+                                <span style={{ color: 'var(--color-primary)' }}>
+                                    {formatSubscriptionDate(calculatedEndDate)}
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     {formData.role === 'admin' && (

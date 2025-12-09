@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS users (
     full_name TEXT NOT NULL,
     role TEXT NOT NULL CHECK (role IN ('admin', 'user')),
     currency TEXT DEFAULT '$',
+    subscription_start_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    subscription_duration_months INTEGER DEFAULT 1,
+    subscription_end_date TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -74,6 +77,9 @@ CREATE POLICY "Users can read own data" ON users
 
 CREATE POLICY "Users can update own data" ON users
     FOR UPDATE USING (true);
+
+CREATE POLICY "Users can delete users" ON users
+    FOR DELETE USING (true);
 
 -- Rentals: Users can only see their own rentals, admins see all
 CREATE POLICY "Users can read own rentals" ON rentals

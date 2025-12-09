@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import StatsCard from '../components/StatsCard';
 import RentalCard from '../components/RentalCard';
+import SubscriptionWidget from '../components/SubscriptionWidget';
 import { useAuth } from '../contexts/AuthContext';
 import { getRentals } from '../utils/storage';
 import { isExpired, isExpiringSoon } from '../utils/dateHelpers';
@@ -71,6 +72,11 @@ const Dashboard = () => {
                         Nueva Renta
                     </button>
                 </div>
+
+                {/* Subscription Widget - Show for all users */}
+                {currentUser.subscriptionEndDate && (
+                    <SubscriptionWidget subscriptionEndDate={currentUser.subscriptionEndDate} />
+                )}
 
                 {/* Stats Grid */}
                 <div className="grid grid-3" style={{ marginBottom: 'var(--spacing-2xl)' }}>

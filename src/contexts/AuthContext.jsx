@@ -35,7 +35,8 @@ export const AuthProvider = ({ children }) => {
                 username: user.username,
                 fullName: user.fullName,
                 role: user.role,
-                currency: user.currency
+                currency: user.currency,
+                subscriptionEndDate: user.subscriptionEndDate
             }));
         } else {
             localStorage.removeItem('session');
@@ -75,7 +76,8 @@ export const AuthProvider = ({ children }) => {
                             username: user.username,
                             fullName: user.full_name,
                             role: user.role,
-                            currency: user.currency || '$'
+                            currency: user.currency || '$',
+                            subscriptionEndDate: user.subscription_end_date
                         });
                         setIsAuthenticated(true);
                     } else {
@@ -91,7 +93,8 @@ export const AuthProvider = ({ children }) => {
                         username: session.username,
                         fullName: session.fullName,
                         role: session.role,
-                        currency: session.currency || '$'
+                        currency: session.currency || '$',
+                        subscriptionEndDate: session.subscriptionEndDate
                     });
                     setIsAuthenticated(true);
                 }
@@ -119,13 +122,29 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, error: 'Contraseña incorrecta' };
             }
 
+            // Check subscription status - ALL users must have active subscription
+            if (user.subscription_end_date) {
+                const now = new Date();
+                const endDate = new Date(user.subscription_end_date);
+
+                if (endDate <= now) {
+                    return {
+                        success: false,
+                        error: 'subscriptionExpired',
+                        message: 'Tu suscripción ha expirado. Contacta al administrador para renovarla.',
+                        expiredDate: user.subscription_end_date
+                    };
+                }
+            }
+
             // Set user session
             const sessionUser = {
                 id: user.id,
                 username: user.username,
                 fullName: user.full_name,
                 role: user.role,
-                currency: user.currency || '$'
+                currency: user.currency || '$',
+                subscriptionEndDate: user.subscription_end_date
             };
 
             setCurrentUser(sessionUser);

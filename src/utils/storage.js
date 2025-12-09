@@ -40,14 +40,24 @@ export const saveUser = async (user) => {
 
         if (existing && existing.id !== user.id) {
             // Update existing user
+            const updateData = {
+                password: user.password,
+                full_name: user.fullName,
+                role: user.role,
+                currency: user.currency
+            };
+
+            // Include subscription fields if provided
+            if (user.subscriptionStartDate !== undefined) {
+                updateData.subscription_start_date = user.subscriptionStartDate;
+            }
+            if (user.subscriptionDurationMonths !== undefined) {
+                updateData.subscription_duration_months = user.subscriptionDurationMonths;
+            }
+
             const { data, error } = await supabase
                 .from('users')
-                .update({
-                    password: user.password,
-                    full_name: user.fullName,
-                    role: user.role,
-                    currency: user.currency
-                })
+                .update(updateData)
                 .eq('id', existing.id)
                 .select()
                 .single();
@@ -56,15 +66,20 @@ export const saveUser = async (user) => {
             return data;
         } else {
             // Insert new user
+            const insertData = {
+                username: user.username,
+                password: user.password,
+                full_name: user.fullName,
+                role: user.role,
+                currency: user.currency || '$',
+                subscription_start_date: user.subscriptionStartDate || new Date().toISOString(),
+                subscription_duration_months: user.subscriptionDurationMonths || 1
+            };
+            // subscription_end_date will be auto-calculated by the database trigger
+
             const { data, error } = await supabase
                 .from('users')
-                .insert({
-                    username: user.username,
-                    password: user.password,
-                    full_name: user.fullName,
-                    role: user.role,
-                    currency: user.currency || '$'
-                })
+                .insert(insertData)
                 .select()
                 .single();
 

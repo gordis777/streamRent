@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import UserCounter from '../components/UserCounter';
+import SubscriptionExpiredModal from '../components/SubscriptionExpiredModal';
 import { Sparkles, LogIn, AlertCircle } from 'lucide-react';
 
 const Login = () => {
@@ -9,6 +10,8 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showExpiredModal, setShowExpiredModal] = useState(false);
+    const [expiredDate, setExpiredDate] = useState(null);
 
     const { login, isAuthenticated } = useAuth();
     const navigate = useNavigate();
@@ -29,13 +32,29 @@ const Login = () => {
         if (result.success) {
             navigate('/');
         } else {
-            setError(result.error);
+            // Check if it's a subscription expiration error
+            if (result.error === 'subscriptionExpired') {
+                setShowExpiredModal(true);
+                setExpiredDate(result.expiredDate);
+                setError('');
+            } else {
+                setError(result.error);
+            }
             setLoading(false);
         }
     };
 
     return (
         <>
+            {showExpiredModal && (
+                <SubscriptionExpiredModal
+                    expiredDate={expiredDate}
+                    onClose={() => {
+                        setShowExpiredModal(false);
+                        setExpiredDate(null);
+                    }}
+                />
+            )}
             <UserCounter />
             <div className="flex-center" style={{ minHeight: '100vh', padding: 'var(--spacing-md)', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
                 <div className="glass-card" style={{
