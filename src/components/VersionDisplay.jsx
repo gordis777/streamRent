@@ -30,7 +30,7 @@ const VersionDisplay = () => {
                     e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                     e.currentTarget.style.background = 'rgba(0, 0, 0, 0.2)';
                 }}>
-                V-1.0
+                V-1.2
             </div>
         </>
     );
