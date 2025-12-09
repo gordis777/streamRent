@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 const UserForm = ({ user, onSave, onClose }) => {
     const [formData, setFormData] = useState({
         username: user?.username || '',
+        fullName: user?.fullName || '',
         password: user ? '' : '', // Don't pre-fill password for edit
         role: user?.role || 'user',
         currency: user?.currency || '$'
@@ -32,6 +33,10 @@ const UserForm = ({ user, onSave, onClose }) => {
             newErrors.username = 'El nombre debe tener al menos 3 caracteres';
         }
 
+        if (!formData.fullName.trim()) {
+            newErrors.fullName = 'Ingresa el nombre completo';
+        }
+
         if (!user && !formData.password) {
             newErrors.password = 'Ingresa una contraseña';
         } else if (formData.password && formData.password.length < 6) {
@@ -53,6 +58,7 @@ const UserForm = ({ user, onSave, onClose }) => {
 
         const userData = {
             username: formData.username,
+            fullName: formData.fullName,
             role: formData.role,
             currency: formData.currency
         };
@@ -90,6 +96,19 @@ const UserForm = ({ user, onSave, onClose }) => {
                             disabled={!!user} // Can't change username when editing
                         />
                         {errors.username && <div style={{ color: 'var(--color-danger)', fontSize: '0.875rem', marginTop: 'var(--spacing-xs)' }}>{errors.username}</div>}
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Nombre Completo *</label>
+                        <input
+                            type="text"
+                            name="fullName"
+                            value={formData.fullName}
+                            onChange={handleChange}
+                            className="form-input"
+                            placeholder="Juan Pérez"
+                        />
+                        {errors.fullName && <div style={{ color: 'var(--color-danger)', fontSize: '0.875rem', marginTop: 'var(--spacing-xs)' }}>{errors.fullName}</div>}
                     </div>
 
                     <div className="form-group">
