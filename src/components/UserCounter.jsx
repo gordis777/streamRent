@@ -165,7 +165,7 @@ const UserCounter = () => {
                     </div>
                 </div>
 
-                {/* Plus badge */}
+                {/* Plus badge - calculated from daily increase */}
                 <div style={{
                     position: 'absolute',
                     top: '8px',
@@ -179,7 +179,7 @@ const UserCounter = () => {
                     border: '1px solid rgba(16, 185, 129, 0.3)',
                     animation: 'badgePop 2s ease-in-out infinite'
                 }}>
-                    +400/mes
+                    +{20 * 30}/mes
                 </div>
             </div>
             <style>{`
